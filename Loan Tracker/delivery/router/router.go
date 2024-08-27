@@ -33,7 +33,7 @@ func publicRouter(router *gin.Engine, userController *usercontroller.UserControl
 	router.POST("/users/forgot-password", userController.ForgotPassword)
 
 	router.GET("/users/verify-email", userController.VerifyUser)
-	router.GET("/users/reset-password", userController.ResetPassword)
+	router.GET("/users/password-reset", userController.ResetPassword)
 
 	// router.GET("/oauth2/login/google", userController.GoogleLogin)
 	// router.GET("/oauth2/callback/google", userController.GoogleCallback)
@@ -41,19 +41,20 @@ func publicRouter(router *gin.Engine, userController *usercontroller.UserControl
 
 func protectedRouter(router *gin.Engine, userController *usercontroller.UserController) {
 	router.GET(
-		"/tokens/refresh",
+		"/token/refresh",
 		middleware.AuthMiddleware("refresh"),
 		userController.RefreshToken,
 	)
 }
 
 func privateUserRouter(router *gin.RouterGroup, userController *usercontroller.UserController) {
-	router.GET("/users/:username", userController.GetUsers)
+	router.GET("/admin/users", userController.GetUsers)
+	router.GET("/users/profile", userController.GetUserProfile)
 	router.PATCH("/users", userController.UpdateProfile)
 
 	router.POST("/users/logout", userController.LogoutUser)
-	router.DELETE("/users", userController.DeleteUser)
-	router.PATCH("/users/change-password", userController.ChangePassword)
+	router.DELETE("/admin/users/:username", userController.DeleteUser)
+	router.PATCH("/users/password-update", userController.ChangePassword)
 }
 
 

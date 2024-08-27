@@ -45,6 +45,7 @@ type UserUsecase interface {
 	LogoutUser(username string) error
 	ChangePassword(username, oldPassword, newPassword string) error
 	GetUsers(claims *LoginClaims) ([]User, error)
+	GetUserByUsername(username string) (*User, error)
 	
 	
 }

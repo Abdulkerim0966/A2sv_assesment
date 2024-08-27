@@ -20,7 +20,7 @@ func (u *UserController) RegisterUser(ctx *gin.Context) {
 		Email     string `form:"email"`
 		Roles     string `form:"roles"`
 		Address   string `form:"address"`
-		Avatar    string `form:"avatar"`
+	
 	}
 
 	err := ctx.ShouldBind(&userData)

@@ -52,7 +52,7 @@ func (u *UserUsecase) RegisterUser(user *domain.User) error {
 		return err
 	}
 
-	emailHeader := "Welcome to Blogs!"
+	emailHeader := "Welcome to Loan Tracker!"
 	emailBody := "Hello " + user.Username + ", please verify your email by clicking <a href=\"" + apiBase + "/users/verify?token=" + verifyToken + "\">here</a>."
 
 	err = config.SendEmail(user.Email, emailHeader, emailBody, true)
