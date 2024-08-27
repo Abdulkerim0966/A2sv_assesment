@@ -32,11 +32,9 @@ func publicRouter(router *gin.Engine, userController *usercontroller.UserControl
 	router.POST("/users/login", userController.LoginUser)
 	router.POST("/users/forgot-password", userController.ForgotPassword)
 
-	router.GET("/users/verify-email", userController.VerifyUser)
-	router.GET("/users/password-reset", userController.ResetPassword)
+	router.GET("/users/verify", userController.VerifyUser)
+	router.GET("/users/reset-password", userController.ResetPassword)
 
-	// router.GET("/oauth2/login/google", userController.GoogleLogin)
-	// router.GET("/oauth2/callback/google", userController.GoogleCallback)
 }
 
 func protectedRouter(router *gin.Engine, userController *usercontroller.UserController) {
@@ -90,7 +88,7 @@ func SetupRouter(mongoClient *mongo.Client) *gin.Engine {
 	// Apply CORS middleware with custom configuration
 	router.Use(cors.New(corsConfig))
 
-	database := mongoClient.Database("blog")
+	database := mongoClient.Database("loanTracker")
 
 	userController := getUserController(database,)
 
