@@ -1,10 +1,12 @@
 package router
 
 import (
+	loancontroller "loanTracker/delivery/controller/loan_controller"
+	"loanTracker/delivery/controller/usercontroller" // Add this import statement
 	"loanTracker/delivery/middleware"
 	"loanTracker/repository"
-	"loanTracker/delivery/controller" // Add this import statement
-	"loanTracker/usecase" // Add this import statement
+	"loanTracker/usecase/userusecases" // Add this import statement
+	"loanTracker/usecase/loanusecases" // Updated import path
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -12,6 +14,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+func getLoanController(database *mongo.Database) *loancontroller.LoanController {
+	loanRepository := repository.NewLoanRepository(database)
+	loanUsecase := loanusecase.NewLoanUsecase(loanRepository)
+	loanController := loancontroller.NewLoanController(loanUsecase)
+
+	return loanController
+}
 
 func getUserController(database *mongo.Database) *usercontroller.UserController {
 	userRepository := repository.NewUserRepository(database)
@@ -19,10 +28,6 @@ func getUserController(database *mongo.Database) *usercontroller.UserController 
 	userUsecase := userusecase.NewUserUsecase(userRepository, authRepository)
 	userController := usercontroller.NewUserController(userUsecase)
 
-	// err := userUsecase.AddRoot()
-	// if err != nil {
-	// 	panic(err)
-	// }
 
 	return userController
 }
@@ -56,6 +61,15 @@ func privateUserRouter(router *gin.RouterGroup, userController *usercontroller.U
 	router.DELETE("/admin/users/:username", userController.DeleteUser)
 	router.PATCH("/users/password-update", userController.ChangePassword)
 }
+
+func privateLoanRouter(router *gin.RouterGroup, loanController *loancontroller.LoanController) {
+	router.POST("/loans", loanController.CreateLoan)
+	router.GET("/admin/loans", loanController.GetAllLoans)
+	router.GET("/loans/:id", loanController.GetLoanById)
+	router.PATCH("/admin/loans/:id/status", loanController.UpdateLoanStatus)
+	router.DELETE("/admin/loans/:id", loanController.DeleteLoan)
+}
+
 
 
 func SetupRouter(mongoClient *mongo.Client) *gin.Engine {
@@ -91,7 +105,7 @@ func SetupRouter(mongoClient *mongo.Client) *gin.Engine {
 	router.Use(cors.New(corsConfig))
 
 	database := mongoClient.Database("blog")
-
+    loanController := getLoanController(database)
 	userController := getUserController(database,)
 
 	publicRouter(router, userController)
@@ -101,6 +115,7 @@ func SetupRouter(mongoClient *mongo.Client) *gin.Engine {
 	privateRouter.Use(middleware.AuthMiddleware("access"))
 
 	privateUserRouter(privateRouter, userController)
+	privateLoanRouter(privateRouter, loanController)
 	
 
 	return router
